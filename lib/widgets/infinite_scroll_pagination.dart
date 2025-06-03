@@ -62,7 +62,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
       await widget.onLoadMore();
 
       // Corrects any offset error caused by layout reflow.
-      _scrollPosition?.correctBy(position.pixels);
+      _scrollPosition?.correctPixels(_scrollPosition!.pixels + position.pixels);
 
       position.setPixels(0);
       position.isVisibleNotifier.value = false;
