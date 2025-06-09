@@ -1,11 +1,11 @@
 name: flutter_infinite_scroll_pagination
 description: "This Flutter package offers effortless infinite scroll loading with just one line of wrapping—no complex setup or controller needed for easy integration."
-version: 1.0.0-beta2
+version: 1.0.0-beta2+1
 publisher: ttankkeo112@gmail.com
 repository: https://github.com/MTtankkeo/flutter_infinite_scroll_pagination
 
 environment:
-  sdk: ^3.9.0-155.0.dev
+  sdk: ^3.8.1
   flutter: ">=1.17.0"
 
 dependencies:
