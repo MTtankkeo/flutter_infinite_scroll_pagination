@@ -4,11 +4,22 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_appbar/flutter_appbar.dart';
 import 'package:flutter_infinite_scroll_pagination/components/infinite_scroll_position.dart';
 
+/// A widget that enables effortless infinite scrolling
+/// by simply wrapping a scrollable child.
+///
+/// It works out-of-the-box with any primary scrollable widget,
+/// automatically detecting the scroll boundary to trigger
+/// the [onLoadMore] callback—no manual [ScrollController]
+/// management is needed.
+///
+/// A loading indicator is displayed while new content is being fetched,
+/// and its position is handled automatically based on the [reverse] property.
 class InfiniteScrollPagination extends StatefulWidget {
   const InfiniteScrollPagination({
     super.key,
     this.isEnabled = true,
     this.loadingIndicator,
+    this.reverse = false,
     required this.onLoadMore,
     required this.child,
   });
@@ -22,12 +33,21 @@ class InfiniteScrollPagination extends StatefulWidget {
   /// TODO: The distance from the bottom at which to trigger [onLoadMore].
   final double preloadOffset = 0.0;
 
-  /// Called to asynchronously load more content when scrolling approaches the loading boundary.
+  /// Called to asynchronously load more content when scrolling approaches
+  /// the loading boundary.
   ///
-  /// Typically used to implement infinite scrolling. This callback should initiate
-  /// an asynchronous task (e.g., network request), and once completed,
+  /// Typically used to implement infinite scrolling. This callback should
+  /// initiate an asynchronous task (e.g., network request), and once completed,
   /// new data should be appended to the existing list.
   final AsyncCallback onLoadMore;
+
+  /// Whether the scroll view scrolls in the reverse direction.
+  ///
+  /// If set to true, the content is ordered from bottom to top, and the loading
+  /// indicator appears at the top. This is similar to [ListView.reverse].
+  ///
+  /// Defaults to false.
+  final bool reverse;
 
   /// The child widget that defines the [Scrollable] widget.
   final Widget child;
@@ -78,8 +98,14 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget indicator = Align(
+      alignment: Alignment.center,
+      child: widget.loadingIndicator ?? _defaultLoadingIndicator(),
+    );
+
     return _RenderInfiniteScrollPagination(
       position: position,
+      reverse: widget.reverse,
       children: [
         NestedScrollConnection(
           onPreScroll: _handleNestedScroll,
@@ -91,11 +117,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
           ),
         ),
 
-        if (widget.isEnabled)
-          Align(
-            alignment: Alignment.center,
-            child: widget.loadingIndicator ?? _defaultLoadingIndicator(),
-          ),
+        if (widget.isEnabled) indicator,
       ],
     );
   }
@@ -112,23 +134,32 @@ class _RenderInfiniteScrollPagination extends MultiChildRenderObjectWidget {
   const _RenderInfiniteScrollPagination({
     required super.children,
     required this.position,
+    required this.reverse,
   });
 
   final InfiniteScrollPosition position;
+  final bool reverse;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _InfiniteScrollPaginationRenderBox(position: position);
+    return _InfiniteScrollPaginationRenderBox(
+      position: position,
+      reverse: reverse,
+    );
   }
 }
 
 class _InfiniteScrollPaginationRenderBox extends RenderBox
     with ContainerRenderObjectMixin<RenderBox, _ParentData> {
-  _InfiniteScrollPaginationRenderBox({required this.position}) {
+  _InfiniteScrollPaginationRenderBox({
+    required this.position,
+    required this.reverse,
+  }) {
     position.addListener(markNeedsLayout);
   }
 
   final InfiniteScrollPosition position;
+  final bool reverse;
 
   @override
   void setupParentData(RenderBox child) {
@@ -184,15 +215,32 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
       PaintingContext innerContext,
       Offset innerOffset,
     ) {
-      final Offset bodyOffset = offset.translate(0, -position.pixels);
-      final double nestedOffset = body.size.height - position.pixels;
+      // Calculate the remaining vertical space in
+      // the viewport after laying out the body.
+      final double availableHeight = size.height - body.size.height;
+
+      // In reverse mode, align the body to the bottom of the viewport.
+      // The overscroll amount [position.pixels] then pushes it down.
+      final Offset bodyOffset = reverse
+          ? offset.translate(0, availableHeight + position.pixels)
+          : offset.translate(0, -position.pixels);
+
+      // Calculate the indicator's offset to place it just above
+      // (in reverse mode) or below (in normal mode) the body.
+      final double nestedOffset = reverse
+          ? availableHeight - (indicator?.size.height ?? 0.0) + position.pixels
+          : body.size.height - position.pixels;
+
       final Offset indicatorOffset = offset.translate(0, nestedOffset);
 
+      // The indicator is visible if there's space to load more
+      // content or if an overscroll is currently in progress.
       final bool isVisible =
           indicator != null &&
           position.extent != 0.0 &&
           position.viewHeight + position.pixels > precisionErrorTolerance;
 
+      // Notify the state to trigger [onLoadMore] if the indicator becomes visible.
       position.isVisibleNotifier.value = isVisible;
 
       innerContext.paintChild(body, bodyOffset);
