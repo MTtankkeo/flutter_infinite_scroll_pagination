@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -103,29 +104,49 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
       child: widget.loadingIndicator ?? _defaultLoadingIndicator(),
     );
 
-    return _RenderInfiniteScrollPagination(
-      position: position,
-      reverse: widget.reverse,
-      children: [
-        NestedScrollConnection(
-          onPreScroll: _handleNestedScroll,
-          onPostScroll: _handleNestedScroll,
-          child: PrimaryScrollController(
-            controller: NestedScrollController(),
-            scrollDirection: Axis.vertical,
-            child: widget.child,
+    return SizedBox.expand(
+      child: Stack(
+        // Sets the alignment for the entire stack containing
+        // the scrollable content and the loading indicator.
+        alignment:
+            widget.reverse ? Alignment.bottomCenter : Alignment.topCenter,
+        children: [
+          _RenderInfiniteScrollPagination(
+            position: position,
+            reverse: widget.reverse,
+            children: [
+              NestedScrollConnection(
+                onPreScroll: _handleNestedScroll,
+                onPostScroll: _handleNestedScroll,
+                child: PrimaryScrollController(
+                  controller: NestedScrollController(),
+                  scrollDirection: Axis.vertical,
+                  child: widget.child,
+                ),
+              ),
+              if (widget.isEnabled) indicator,
+            ],
           ),
-        ),
-
-        if (widget.isEnabled) indicator,
-      ],
+        ],
+      ),
     );
   }
 
+  /// Returns a loading indicator widget based on the current platform.
+  /// Uses [CupertinoActivityIndicator] for iOS or macOS
+  /// and [CircularProgressIndicator] for others (e.g. Android).
+  Widget platformLoadingIndicator(BuildContext context) {
+    final platform = Theme.of(context).platform;
+    return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS
+        ? CupertinoActivityIndicator()
+        : CircularProgressIndicator();
+  }
+
+  /// Returns the default loading indicator with vertical padding.
   Widget _defaultLoadingIndicator() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15),
-      child: CircularProgressIndicator(),
+      child: platformLoadingIndicator(context),
     );
   }
 }
@@ -235,8 +256,7 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
 
       // The indicator is visible if there's space to load more
       // content or if an overscroll is currently in progress.
-      final bool isVisible =
-          indicator != null &&
+      final bool isVisible = indicator != null &&
           position.extent != 0.0 &&
           position.viewHeight + position.pixels > precisionErrorTolerance;
 

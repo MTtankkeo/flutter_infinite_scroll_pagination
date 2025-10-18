@@ -7,10 +7,12 @@ Experience a whole new level of convenience with just a single line of wrappingâ
 
 ```dart
 InfiniteScrollPagination(
+    reverse: false,
     isEnabled: ...,
     onLoadMore: ...,
+    loadingIndicator: ...,
     child: ListView.builder(
-        shrinkWrap: true,
+        shrinkWrap: true, // Must always be set to true
         itemCount: _items.length,
         itemBuilder: (context, index) {
             return Text(_items[index]);
