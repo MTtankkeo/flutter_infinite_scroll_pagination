@@ -88,8 +88,22 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
       isLoading = true;
       await widget.onLoadMore();
 
-      // Corrects any offset error caused by layout reflow.
-      _scrollPosition?.correctPixels(_scrollPosition!.pixels + position.pixels);
+      /// Whether the scroll offset is large enough to require correction
+      /// to account for layout reflow or overscroll.
+      final shouldCorrect = position.pixels > precisionErrorTolerance;
+
+      // Stops any ongoing scroll and applies offset correction
+      // to account for the fully collapsed indicator layout.
+      if (shouldCorrect && _scrollPosition != null) {
+        final resolvedPixels = _scrollPosition!.pixels + position.pixels;
+        final scrollDelegate = _scrollPosition as ScrollActivityDelegate;
+
+        // Stop any ongoing scrolling activity to prevent interference.
+        _scrollPosition!.beginActivity(IdleScrollActivity(scrollDelegate));
+
+        // Corrects any offset error caused by layout reflow.
+        _scrollPosition!.correctPixels(resolvedPixels);
+      }
 
       position.setPixels(0);
       position.isVisibleNotifier.value = false;

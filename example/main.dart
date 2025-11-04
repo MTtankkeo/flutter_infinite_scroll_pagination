@@ -12,25 +12,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(body: SafeArea(child: TestView())),
+      home: Scaffold(
+        body: SafeArea(
+          child: Example(),
+        ),
+      ),
     );
   }
 }
 
-class TestView extends StatefulWidget {
-  const TestView({super.key});
+/// Example view showing how to use InfiniteScrollPagination.
+class Example extends StatefulWidget {
+  const Example({super.key});
 
   @override
-  State<TestView> createState() => _TestViewState();
+  State<Example> createState() => _ExampleState();
 }
 
-class _TestViewState extends State<TestView> {
+class _ExampleState extends State<Example> {
   final List<String> _items = [];
 
   @override
   Widget build(BuildContext context) {
     return InfiniteScrollPagination(
+      // Whether infinite scrolling is enabled, set false
+      // if you reached the end or want to stop loading.
       isEnabled: _items.length < 100,
+
+      // Callback executed when the user scrolls to the bottom,
+      // Perform your async data fetching here.
       onLoadMore: () async {
         await Future.delayed(Duration(seconds: 1));
 
@@ -40,6 +50,9 @@ class _TestViewState extends State<TestView> {
           }
         });
       },
+
+      // The child must be a Scrollable widget, (e.g., ListView, GridView)
+      // Must set `shrinkWrap`: true to ensure proper layout inside InfiniteScrollPagination.
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: _items.length,

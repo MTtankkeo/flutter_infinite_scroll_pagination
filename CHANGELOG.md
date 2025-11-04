@@ -11,3 +11,6 @@
 - Updated the default loading indicator to automatically switch between `CupertinoActivityIndicator` and `CircularProgressIndicator` based on the current theme and platform.
 
 - Fixed an issue where the `InfiniteScrollPagination` widget would not function correctly if its parent widget imposed strict size constraints, such as `Expanded` widget.
+
+## 1.1.1
+- Fixed scroll offset calculation to correctly handle collapsed indicator area on iOS with **BouncingScrollPhysics**, ensuring smooth correction despite bounce effects
