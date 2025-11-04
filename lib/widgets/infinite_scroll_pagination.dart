@@ -67,6 +67,11 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   /// Whether [widget.onLoadMore] has been called and is currently awaiting a response.
   bool isLoading = false;
 
+  /// Applies additional scroll to the infinite scroll position
+  /// when the nested scroll reaches its maximum extent.
+  ///
+  /// This allows the outer scrollable to "pass through" extra scroll
+  /// to the inner pagination logic, enabling continuous loading.
   double _handleNestedScroll(double available, ScrollPosition scroll) {
     _scrollPosition = scroll;
 
@@ -77,6 +82,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
     return 0.0;
   }
 
+  /// Attempts to load more items when the loading indicator becomes visible.
   void _tryLoadMore() async {
     if (!isLoading) {
       isLoading = true;
@@ -151,6 +157,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   }
 }
 
+/// A widget that wraps its children for infinite scroll pagination.
 class _RenderInfiniteScrollPagination extends MultiChildRenderObjectWidget {
   const _RenderInfiniteScrollPagination({
     required super.children,
@@ -170,6 +177,12 @@ class _RenderInfiniteScrollPagination extends MultiChildRenderObjectWidget {
   }
 }
 
+/// The render box responsible for laying out and painting the
+/// body and loading indicator for infinite scroll.
+///
+/// It listens to [InfiniteScrollPosition] changes to trigger layout
+/// updates, adjusts painting offsets based on scroll position,
+/// and updates visibility state of the loading indicator.
 class _InfiniteScrollPaginationRenderBox extends RenderBox
     with ContainerRenderObjectMixin<RenderBox, _ParentData> {
   _InfiniteScrollPaginationRenderBox({
@@ -272,4 +285,6 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
   }
 }
 
+/// ParentData used by [_InfiniteScrollPaginationRenderBox]
+/// to store positional information for each child.
 class _ParentData extends ContainerBoxParentData<RenderBox> {}

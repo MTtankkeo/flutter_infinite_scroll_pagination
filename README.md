@@ -1,7 +1,11 @@
 # Introduction
 Experience a whole new level of convenience with just a single line of wrapping—no complex setup or controller required—for effortless infinite scroll loading.
 
-> See Also, If you want the change-log by version for this package. refer to [Change Log](CHANGELOG.md) for details.
+> [!IMPORTANT]
+> The `Scrollable` widget (e.g., ListView) must use a `NestedScrollController` or a subclass. Using a regular ScrollController will cause the infinite scroll pagination to fail.
+
+## Why Use This Library?
+This package eliminates the usual boilerplate of infinite scroll implementations. Simply wrap your scrollable widget with `InfiniteScrollPagination`, and it just works. Perfect for adding infinite scroll to lists, grids, or any scrollable content **without worrying about controllers or extra setup.**
 
 ## Usage
 
