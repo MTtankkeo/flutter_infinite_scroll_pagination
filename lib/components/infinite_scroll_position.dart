@@ -9,6 +9,8 @@ class InfiniteScrollPosition extends Listenable {
   /// The total scrollable extent (e.g., size of loading indicator)
   double extent = 0.0;
 
+  double bouncingPixels = 0.0;
+
   final _pixelsNotifier = ValueNotifier<double>(0.0);
 
   /// Gets the current scroll offset in pixels.

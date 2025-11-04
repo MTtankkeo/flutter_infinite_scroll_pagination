@@ -20,6 +20,7 @@ class InfiniteScrollPagination extends StatefulWidget {
     super.key,
     this.isEnabled = true,
     this.loadingIndicator,
+    this.preloadOffset = 0.0,
     this.reverse = false,
     required this.onLoadMore,
     required this.child,
@@ -31,8 +32,8 @@ class InfiniteScrollPagination extends StatefulWidget {
   /// A widget to display while loading more content (e.g., a loading spinner).
   final Widget? loadingIndicator;
 
-  /// TODO: The distance from the bottom at which to trigger [onLoadMore].
-  final double preloadOffset = 0.0;
+  /// The distance from the bottom at which to trigger [onLoadMore].
+  final double preloadOffset;
 
   /// Called to asynchronously load more content when scrolling approaches
   /// the loading boundary.
@@ -77,6 +78,12 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
 
     if (scroll.pixels == scroll.maxScrollExtent) {
       return position.setPixelsByDelta(available);
+    }
+
+    // Trigger load more when the remaining scroll distance
+    // to the end is less than the specified preloadOffset.
+    if (scroll.extentAfter < widget.preloadOffset) {
+      _tryLoadMore();
     }
 
     return 0.0;
@@ -279,7 +286,8 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
           ? availableHeight - (indicator?.size.height ?? 0.0) + position.pixels
           : body.size.height - position.pixels;
 
-      final Offset indicatorOffset = offset.translate(0, nestedOffset);
+      Offset indicatorOffset = offset.translate(0, nestedOffset);
+      indicatorOffset = indicatorOffset.translate(0, -position.bouncingPixels);
 
       // The indicator is visible if there's space to load more
       // content or if an overscroll is currently in progress.
