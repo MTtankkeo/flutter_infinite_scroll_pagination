@@ -8,6 +8,9 @@ No, not at all! Many developers mistakenly assume that setting `shrinkWrap: true
    - `_InfiniteScrollPaginationRenderBox` measures and lays out the scrollable child (`ListView` or `GridView`) along with the loading indicator.  
    - It respects the parent’s constraints by clamping the total height:  
      ```dart
+     // Perform layout for measuring an intrinsic size of the children.
+     body.layout(constraints, parentUsesSize: true);
+
      size = Size(body.size.width, totalHeight.clamp(0.0, constraints.maxHeight));
      ```  
      This means the child never expands beyond the available viewport, regardless of `shrinkWrap`.
@@ -32,7 +35,42 @@ No, not at all! Many developers mistakenly assume that setting `shrinkWrap: true
 
 So, feel free to use `shrinkWrap` when necessary—it’s not a “performance killer,” but a tool to handle layout flexibility safely.
 
-## "No! I tried it and experienced performance issues!" ❌
+## "No! Using RenderShrinkWrappingViewport!"
+
+**Yes, and so what?** 
+
+`RenderShrinkWrappingViewport` **still supports lazy building**. Let me clarify this once and for all:
+
+### The Reality of RenderShrinkWrappingViewport ✅
+
+1. **Lazy building is preserved**
+   - Items are still built on-demand, not all at once
+   - Viewport culling works exactly the same way
+   - Only visible items (plus a small buffer) are actually built and rendered
+
+### Challenge to Critics 🎯
+
+If you believe `RenderShrinkWrappingViewport` inherently causes performance issues:
+
+1. Show me **concrete benchmarks** comparing:
+   - 15 items with `shrinkWrap: false`
+   - 15 items with `shrinkWrap: true`
+   
+2. Prove that lazy building is disabled (hint: it's not)
+
+### Bottom Line
+
+**"Using RenderShrinkWrappingViewport" is not an argument.** 
+
+It's just an implementation detail that:
+- ✅ Still does lazy building
+- ✅ Still culls off-screen items
+- ✅ Has negligible performance difference with small item counts
+- ✅ Works perfectly fine within bounded constraints
+
+Stop repeating dogma without evidence. **Test it yourself** if you don't believe it.
+
+## "No! I tried it and experienced performance issues at another project and package!" ❌
 
 You might think that `shrinkWrap: true` inherently causes performance degradation, but in most cases, the problem lies elsewhere:
 

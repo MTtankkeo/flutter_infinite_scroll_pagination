@@ -13,4 +13,9 @@
 - Fixed an issue where the `InfiniteScrollPagination` widget would not function correctly if its parent widget imposed strict size constraints, such as `Expanded` widget.
 
 ## 1.1.1
-- Fixed scroll offset calculation to correctly handle collapsed indicator area on iOS with **BouncingScrollPhysics**, ensuring smooth correction despite bounce effects
+- Fixed scroll offset calculation to correctly handle collapsed indicator area on iOS with **BouncingScrollPhysics**, ensuring smooth correction despite bounce effects.
+
+## 1.1.2
+- Mdofiyed README.md about shrinkWrap.
+
+- Added DESCRIPTION.md.
