@@ -9,6 +9,8 @@ class InfiniteScrollPosition extends Listenable {
   /// The total scrollable extent (e.g., size of loading indicator)
   double extent = 0.0;
 
+  /// The extra scroll offset caused by iOS-style bouncing/overscroll, And
+  /// used to sync the loading indicator position with the bouncing effect.
   double bouncingPixels = 0.0;
 
   final _pixelsNotifier = ValueNotifier<double>(0.0);

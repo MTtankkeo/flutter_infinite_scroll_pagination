@@ -21,6 +21,7 @@ class InfiniteScrollPagination extends StatefulWidget {
     this.isEnabled = true,
     this.loadingIndicator,
     this.preloadOffset = 0.0,
+    this.canBouncing = true,
     this.reverse = false,
     required this.onLoadMore,
     required this.child,
@@ -34,6 +35,10 @@ class InfiniteScrollPagination extends StatefulWidget {
 
   /// The distance from the bottom at which to trigger [onLoadMore].
   final double preloadOffset;
+
+  /// Whether the loading indicator should sync with iOS-style bouncing
+  /// scroll and move along with the overscroll effect.
+  final bool canBouncing;
 
   /// Called to asynchronously load more content when scrolling approaches
   /// the loading boundary.
@@ -68,6 +73,9 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   /// Whether [widget.onLoadMore] has been called and is currently awaiting a response.
   bool isLoading = false;
 
+  /// Whether infinite scroll pagination is enabled.
+  bool get isEnabled => widget.isEnabled;
+
   /// Applies additional scroll to the infinite scroll position
   /// when the nested scroll reaches its maximum extent.
   ///
@@ -89,8 +97,20 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
     return 0.0;
   }
 
+  /// Observes iOS-style bouncing by tracking the extra scroll offset.
+  /// Used so the loading indicator can sync with the bounce without
+  /// consuming scroll.
+  double _handleBouncing(double available, ScrollPosition scroll) {
+    if (widget.canBouncing) {
+      position.bouncingPixels = available;
+    }
+
+    return 0.0;
+  }
+
   /// Attempts to load more items when the loading indicator becomes visible.
   void _tryLoadMore() async {
+    if (!isEnabled) return;
     if (!isLoading) {
       isLoading = true;
       await widget.onLoadMore();
@@ -143,6 +163,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
             reverse: widget.reverse,
             children: [
               NestedScrollConnection(
+                onBouncing: _handleBouncing,
                 onPreScroll: _handleNestedScroll,
                 onPostScroll: _handleNestedScroll,
                 child: PrimaryScrollController(
@@ -151,7 +172,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
                   child: widget.child,
                 ),
               ),
-              if (widget.isEnabled) indicator,
+              if (isEnabled) indicator,
             ],
           ),
         ],
