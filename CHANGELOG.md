@@ -19,3 +19,10 @@
 - Mdofiyed README.md about shrinkWrap.
 
 - Added DESCRIPTION.md.
+
+## 1.2.0
+- Added `preloadOffset` option to define the distance from the bottom at which to trigger `onLoadMore`.
+
+- Added `canBouncing` option to determine whether the loading indicator should sync with iOS-style bouncing scroll and move along with the overscroll effect.
+
+- Magically resolved a severe performance issue related to a non-existent `shrinkWrap` in the layout calculation and structure of this package. 😏 (In reality, nothing was changed—because there was nothing to fix.)
