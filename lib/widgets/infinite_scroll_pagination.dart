@@ -183,7 +183,20 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
                   child: widget.child,
                 ),
               ),
-              if (isEnabled) indicator,
+
+              // When the indicator does not need to be rendered at all.
+              if (isEnabled)
+                ListenableBuilder(
+                  listenable: position.isVisibleNotifier,
+                  builder: (context, child) {
+                    // Controls the loading indicator animation based on visibility.
+                    // Runs animations only when the indicator is actually visible.
+                    return TickerMode(
+                      enabled: position.isVisibleNotifier.value,
+                      child: indicator,
+                    );
+                  },
+                ),
             ],
           ),
         ],
@@ -327,11 +340,15 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
           position.extent != 0.0 &&
           position.viewHeight + position.pixels > precisionErrorTolerance;
 
-      // Notify the state to trigger [onLoadMore] if the indicator becomes visible.
-      position.isVisibleNotifier.value = isVisible;
+      // Defers updating the notifier until the next frame to avoid triggering a rebuild
+      // during the paint phase, preventing the "Build scheduled during frame" assertion.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        position.isVisibleNotifier.value = isVisible;
+      });
 
       innerContext.paintChild(body, bodyOffset);
 
+      // Paints the loading indicator only if it is visible.
       if (isVisible) {
         innerContext.paintChild(indicator, indicatorOffset);
       }

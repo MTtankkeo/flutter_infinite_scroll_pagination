@@ -24,9 +24,11 @@ InfiniteScrollPagination(
     reverse: false,
     isEnabled: ...,
     onLoadMore: ...,
+    preloadOffset: 500, // Default is zero.
     loadingIndicator: ...,
     child: ListView.builder(
-        // Set to true in some cases. (Lazy build is still maintained)
+        // Set to true in some cases.
+        // (But, lazy building is still maintained)
         shrinkWrap: true,
         itemCount: _items.length,
         itemBuilder: (context, index) {
