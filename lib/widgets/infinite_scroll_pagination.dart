@@ -113,28 +113,33 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
     if (!isEnabled) return;
     if (!isLoading) {
       isLoading = true;
-      await widget.onLoadMore();
 
-      /// Whether the scroll offset is large enough to require correction
-      /// to account for layout reflow or overscroll.
-      final shouldCorrect = position.pixels > precisionErrorTolerance;
+      try {
+        await widget.onLoadMore();
+      } catch (_) {
+        rethrow;
+      } finally {
+        /// Whether the scroll offset is large enough to require correction
+        /// to account for layout reflow or overscroll.
+        final shouldCorrect = position.pixels > precisionErrorTolerance;
 
-      // Stops any ongoing scroll and applies offset correction
-      // to account for the fully collapsed indicator layout.
-      if (shouldCorrect && _scrollPosition != null) {
-        final resolvedPixels = _scrollPosition!.pixels + position.pixels;
-        final scrollDelegate = _scrollPosition as ScrollActivityDelegate;
+        // Stops any ongoing scroll and applies offset correction
+        // to account for the fully collapsed indicator layout.
+        if (shouldCorrect && _scrollPosition != null) {
+          final resolvedPixels = _scrollPosition!.pixels + position.pixels;
+          final scrollDelegate = _scrollPosition as ScrollActivityDelegate;
 
-        // Stop any ongoing scrolling activity to prevent interference.
-        _scrollPosition!.beginActivity(IdleScrollActivity(scrollDelegate));
+          // Stop any ongoing scrolling activity to prevent interference.
+          _scrollPosition!.beginActivity(IdleScrollActivity(scrollDelegate));
 
-        // Corrects any offset error caused by layout reflow.
-        _scrollPosition!.correctPixels(resolvedPixels);
+          // Corrects any offset error caused by layout reflow.
+          _scrollPosition!.correctPixels(resolvedPixels);
+        }
+
+        position.setPixels(0);
+        position.isVisibleNotifier.value = false;
+        isLoading = false;
       }
-
-      position.setPixels(0);
-      position.isVisibleNotifier.value = false;
-      isLoading = false;
     }
   }
 
@@ -142,6 +147,12 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   void initState() {
     super.initState();
     position.isVisibleNotifier.addListener(_tryLoadMore);
+  }
+
+  @override
+  void dispose() {
+    position.isVisibleNotifier.dispose();
+    super.dispose();
   }
 
   @override
