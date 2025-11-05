@@ -26,3 +26,6 @@
 - Added `canBouncing` option to determine whether the loading indicator should sync with iOS-style bouncing scroll and move along with the overscroll effect.
 
 - Magically resolved a severe performance issue related to a non-existent `shrinkWrap` in the layout calculation and structure of this package. 😏 (In reality, nothing was changed—because there was nothing to fix.)
+
+# 1.2.1
+- Fixed an issue where the loading indicator, although correctly excluded from rendering when not needed, would still receive ticks if layout calculation or tree retention was required for scrolling, causing the next frame to be scheduled and a re-render to occur even when the indicator was not visible.
