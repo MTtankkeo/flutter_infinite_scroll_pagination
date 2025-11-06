@@ -29,3 +29,6 @@
 
 # 1.2.1
 - Fixed an issue where the loading indicator, although correctly excluded from rendering when not needed, would still receive ticks if layout calculation or tree retention was required for scrolling, causing the next frame to be scheduled and a re-render to occur even when the indicator was not visible.
+
+# 1.2.2
+- Bumped the minimum version of the flutter_appbar dependency to 1.7.0.

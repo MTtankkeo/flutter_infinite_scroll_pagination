@@ -177,10 +177,9 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
                 onBouncing: _handleBouncing,
                 onPreScroll: _handleNestedScroll,
                 onPostScroll: _handleNestedScroll,
-                child: PrimaryScrollController(
-                  controller: NestedScrollController(),
-                  scrollDirection: Axis.vertical,
-                  child: widget.child,
+                child: NestedScrollControllerScope(
+                  factory: (context) => NestedScrollController(),
+                  builder: (context, _) => widget.child,
                 ),
               ),
 
