@@ -25,10 +25,13 @@
 
 - Added `canBouncing` option to determine whether the loading indicator should sync with iOS-style bouncing scroll and move along with the overscroll effect.
 
-- Magically resolved a severe performance issue related to a non-existent `shrinkWrap` in the layout calculation and structure of this package. 😏 (In reality, nothing was changed—because there was nothing to fix.)
-
 # 1.2.1
 - Fixed an issue where the loading indicator, although correctly excluded from rendering when not needed, would still receive ticks if layout calculation or tree retention was required for scrolling, causing the next frame to be scheduled and a re-render to occur even when the indicator was not visible.
 
 # 1.2.2
 - Bumped the minimum version of the flutter_appbar dependency to 1.7.0.
+
+## 1.3.0
+- Replaced the `flutter_appbar` dependency with `flutter_nested_scroll` for nested scroll coordination.
+
+- Raised the minimum supported versions to Dart 3.12 and Flutter 3.44.

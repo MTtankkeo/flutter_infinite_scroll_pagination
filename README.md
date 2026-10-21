@@ -1,5 +1,5 @@
 # Introduction
-Experience a whole new level of convenience with just a single line of wrapping—no complex setup or controller required—for effortless infinite scroll loading.
+Experience a whole new level of convenience with just a single line of wrapping no complex setup or controller required for effortless infinite scroll loading.
 
 > [!IMPORTANT]
 > The `Scrollable` widget (e.g., ListView, GridView) must use a `NestedScrollController` or a subclass. Using a regular ScrollController will cause the infinite scroll pagination to fail.
