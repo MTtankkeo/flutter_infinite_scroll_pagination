@@ -6,16 +6,6 @@ void main() {
   testWidgets(
     "Ensures the scrollable child of InfiniteScrollPagination lazily builds with shrinkWrap: true.",
     (tester) async {
-      // Reality check test. This test exists because some people still believe
-      // that setting `shrinkWrap: true` forces ListView to build every item at once.
-      // It doesn’t. It never did. It never will.
-      //
-      // But since debates are louder than facts, we’re letting
-      // the test runner handle the argument for us.
-      //
-      // But they’ll probably still trust their feelings over facts.
-      // Well, it is what it is.
-
       tester.view.physicalSize = Size(200, 200);
       tester.view.devicePixelRatio = 1.0;
 
@@ -29,8 +19,8 @@ void main() {
             isEnabled: true,
             child: ListView.builder(
               itemCount: 1000,
-              cacheExtent: 0.0,
               shrinkWrap: true,
+              scrollCacheExtent: .pixels(0),
               itemBuilder: (context, index) {
                 buildCount += 1;
                 return SizedBox(height: 50);
@@ -49,11 +39,6 @@ void main() {
         buildCount,
         lessThan(10),
         reason: "Only visible items should be built lazily",
-      );
-
-      tester.printToConsole(
-        "Wow…! It actually passed! But wait—does that mean"
-        "Flutter engine is lying right now!? What a shocker!!",
       );
     },
   );

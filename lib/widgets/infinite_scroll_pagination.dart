@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_appbar/flutter_appbar.dart';
-import 'package:flutter_infinite_scroll_pagination/components/infinite_scroll_position.dart';
+import 'package:flutter_infinite_scroll_pagination/flutter_infinite_scroll_pagination.dart';
+import 'package:flutter_nested_scroll/flutter_nested_scroll.dart';
 
 /// A widget that enables effortless infinite scrolling
 /// by simply wrapping a scrollable child.
@@ -60,12 +60,11 @@ class InfiniteScrollPagination extends StatefulWidget {
   final Widget child;
 
   @override
-  State<InfiniteScrollPagination> createState() =>
-      _InfiniteScrollPaginationState();
+  State<InfiniteScrollPagination> createState() => _InfiniteScrollPaginationState();
 }
 
 class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
-  final InfiniteScrollPosition position = InfiniteScrollPosition();
+  final position = InfiniteScrollPosition();
 
   /// Defines the [ScrollPosition] instance detected from the current child widget.
   ScrollPosition? _scrollPosition;
@@ -158,7 +157,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   @override
   Widget build(BuildContext context) {
     final Widget indicator = Align(
-      alignment: Alignment.center,
+      alignment: .center,
       child: widget.loadingIndicator ?? _defaultLoadingIndicator(),
     );
 
@@ -166,8 +165,7 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
       child: Stack(
         // Sets the alignment for the entire stack containing
         // the scrollable content and the loading indicator.
-        alignment:
-            widget.reverse ? Alignment.bottomCenter : Alignment.topCenter,
+        alignment: widget.reverse ? .bottomCenter : .topCenter,
         children: [
           _RenderInfiniteScrollPagination(
             position: position,
@@ -208,15 +206,13 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
   /// and [CircularProgressIndicator] for others (e.g. Android).
   Widget platformLoadingIndicator(BuildContext context) {
     final platform = Theme.of(context).platform;
-    return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS
-        ? CupertinoActivityIndicator()
-        : CircularProgressIndicator();
+    return platform == .iOS || platform == .macOS ? CupertinoActivityIndicator() : CircularProgressIndicator();
   }
 
   /// Returns the default loading indicator with vertical padding.
   Widget _defaultLoadingIndicator() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15),
+      padding: .symmetric(vertical: 15),
       child: platformLoadingIndicator(context),
     );
   }
@@ -248,8 +244,7 @@ class _RenderInfiniteScrollPagination extends MultiChildRenderObjectWidget {
 /// It listens to [InfiniteScrollPosition] changes to trigger layout
 /// updates, adjusts painting offsets based on scroll position,
 /// and updates visibility state of the loading indicator.
-class _InfiniteScrollPaginationRenderBox extends RenderBox
-    with ContainerRenderObjectMixin<RenderBox, _ParentData> {
+class _InfiniteScrollPaginationRenderBox extends RenderBox with ContainerRenderObjectMixin<RenderBox, _ParentData> {
   _InfiniteScrollPaginationRenderBox({
     required this.position,
     required this.reverse,
@@ -269,7 +264,7 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
-    final Offset translatedOffset = Offset(0, -this.position.pixels);
+    final translatedOffset = Offset(0, -this.position.pixels);
 
     // Adjusts the position to compensate for the offset modification.
     return result.addWithPaintOffset(
@@ -294,14 +289,16 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
     );
 
     // Calculate the remaining height and update position information.
-    final double availableHeight = constraints.maxHeight - body.size.height;
-    final double indicatorHeight = indicator?.size.height ?? 0.0;
+    final availableHeight = constraints.maxHeight - body.size.height;
+    final indicatorHeight = indicator?.size.height ?? 0.0;
+
     position
       ..viewHeight = availableHeight
       ..extent = indicatorHeight;
 
     // Set the total size, considering the maximum height constraint.
     final totalHeight = body.size.height + indicatorHeight;
+
     size = Size(body.size.width, totalHeight.clamp(0.0, constraints.maxHeight));
   }
 
@@ -316,17 +313,17 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
     ) {
       // Calculate the remaining vertical space in
       // the viewport after laying out the body.
-      final double availableHeight = size.height - body.size.height;
+      final availableHeight = size.height - body.size.height;
 
       // In reverse mode, align the body to the bottom of the viewport.
       // The overscroll amount [position.pixels] then pushes it down.
-      final Offset bodyOffset = reverse
+      final bodyOffset = reverse
           ? offset.translate(0, availableHeight + position.pixels)
           : offset.translate(0, -position.pixels);
 
       // Calculate the indicator's offset to place it just above
       // (in reverse mode) or below (in normal mode) the body.
-      final double nestedOffset = reverse
+      final nestedOffset = reverse
           ? availableHeight - (indicator?.size.height ?? 0.0) + position.pixels
           : body.size.height - position.pixels;
 
@@ -335,7 +332,8 @@ class _InfiniteScrollPaginationRenderBox extends RenderBox
 
       // The indicator is visible if there's space to load more
       // content or if an overscroll is currently in progress.
-      final bool isVisible = indicator != null &&
+      final isVisible =
+          indicator != null &&
           position.extent != 0.0 &&
           position.viewHeight + position.pixels > precisionErrorTolerance;
 

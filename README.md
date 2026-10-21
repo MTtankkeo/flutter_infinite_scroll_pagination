@@ -14,11 +14,6 @@ This package eliminates the usual boilerplate of infinite scroll implementations
 
 ## Usage
 
-> [!NOTE]
-> 💡 Some beginners might worry that setting `shrinkWrap: true` causes ListView or GridView to build all items at once.  
-> In reality, this package ensures lazy building is fully maintained, and objective tests confirm that enabling `shrinkWrap` has no measurable performance impact.  
-> For those who want a technical and objective explanation, please refer to [DESCRIPTION.md](DESCRIPTION.md) for details and evidence.
-
 ```dart
 InfiniteScrollPagination(
     reverse: false,
@@ -27,10 +22,6 @@ InfiniteScrollPagination(
     preloadOffset: 500, // Default is zero.
     loadingIndicator: ...,
     child: ListView.builder(
-        // Can be set to true if needed (recommended in most cases).
-        // Lazy building is fully preserved because constraints are enforced internally.
-        // Enabling this has been measured to have no noticeable performance impact.
-        shrinkWrap: true,
         itemCount: _items.length,
         itemBuilder: (context, index) {
             return Text(_items[index]);
