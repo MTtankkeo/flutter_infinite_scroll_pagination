@@ -137,7 +137,13 @@ class _InfiniteScrollPaginationState extends State<InfiniteScrollPagination> {
 
         position.setPixels(0);
         position.isVisibleNotifier.value = false;
-        isLoading = false;
+
+        // Keep loading locked until the parent rebuild applies isEnabled.
+        await WidgetsBinding.instance.endOfFrame;
+
+        if (mounted) {
+          isLoading = false;
+        }
       }
     }
   }

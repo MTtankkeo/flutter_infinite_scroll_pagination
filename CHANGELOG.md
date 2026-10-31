@@ -35,3 +35,6 @@
 - Replaced the `flutter_appbar` dependency with `flutter_nested_scroll` for nested scroll coordination.
 
 - Raised the minimum supported versions to Dart 3.12 and Flutter 3.44.
+
+## 1.3.1
+- Fixed duplicate `onLoadMore` calls during ballistic scrolling when pagination is disabled after a request completes.
