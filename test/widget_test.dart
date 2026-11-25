@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_infinite_scroll_pagination/flutter_infinite_scroll_pagination.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,10 +22,10 @@ void main() {
             child: ListView.builder(
               itemCount: 1000,
               shrinkWrap: true,
-              scrollCacheExtent: .pixels(0),
+              scrollCacheExtent: const .pixels(0),
               itemBuilder: (context, index) {
                 buildCount += 1;
-                return SizedBox(height: 50);
+                return const SizedBox(height: 50);
               },
             ),
           ),
@@ -118,4 +118,82 @@ void main() {
     await tester.pumpAndSettle();
     expect(requestCount, 1);
   });
+
+  for (final reverse in [false, true]) {
+    testWidgets(
+      'continues loading when the indicator stays visible after completion (reverse: $reverse)',
+      (tester) async {
+        final count = ValueNotifier(1);
+        addTearDown(count.dispose);
+
+        final requests = <Completer<void>>[];
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Center(
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: count,
+                  builder: (context, count, _) {
+                    return InfiniteScrollPagination(
+                      reverse: reverse,
+                      loadingIndicator: const SizedBox(height: 40),
+                      onLoadMore: () {
+                        final request = Completer<void>();
+                        requests.add(request);
+                        return request.future;
+                      },
+                      child: ListView.builder(
+                        reverse: reverse,
+                        shrinkWrap: true,
+                        itemCount: count,
+                        itemBuilder: (_, _) => const SizedBox(height: 50),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+        expect(requests, hasLength(1));
+
+        // The next page still leaves room for the loading indicator.
+        count.value = 2;
+        requests.first.complete();
+        await tester.idle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 16));
+        await tester.pump(const Duration(milliseconds: 16));
+
+        // The visible indicator starts the next request after the loading lock is released.
+        final InfiniteScrollPaginationState state = tester.state(find.byType(InfiniteScrollPagination));
+        expect(state.isLoading, isTrue);
+        expect(state.position.isVisibleNotifier.value, isTrue);
+
+        // A visible indicator must continue loading instead of remaining idle.
+        expect(requests, hasLength(2));
+
+        // Fill the viewport and complete the second request.
+        count.value = 20;
+        requests.last.complete();
+        await tester.idle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 16));
+        await tester.pump(const Duration(milliseconds: 16));
+
+        // Loading stops and the indicator is hidden without another request.
+        expect(state.isLoading, isFalse);
+        expect(state.position.isVisibleNotifier.value, isFalse);
+        expect(state.position.pixels, 0);
+        expect(requests, hasLength(2));
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
 }

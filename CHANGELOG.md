@@ -38,3 +38,10 @@
 
 ## 1.3.1
 - Fixed duplicate `onLoadMore` calls during ballistic scrolling when pagination is disabled after a request completes.
+
+## 1.4.0
+- Fixed an issue where the loading indicator could remain visible without triggering another request after a page finished loading.
+- Migrated the default loading indicators to `material_ui` and `cupertino_ui`.
+- Moved implementation files to `lib/src`. Use `package:flutter_infinite_scroll_pagination/flutter_infinite_scroll_pagination.dart` instead of importing implementation files directly.
+- Updated `flutter_nested_scroll` to ^1.2.0.
+- Raised the minimum supported versions to Dart 3.13 and Flutter 3.47.

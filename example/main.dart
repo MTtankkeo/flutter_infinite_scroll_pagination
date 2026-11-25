@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_infinite_scroll_pagination/flutter_infinite_scroll_pagination.dart';
 
 void main() {
@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: SafeArea(
@@ -51,10 +51,7 @@ class _ExampleState extends State<Example> {
         });
       },
 
-      // The child must be a Scrollable widget, (e.g., ListView, GridView)
-      // Must set `shrinkWrap`: true to ensure proper layout inside InfiniteScrollPagination.
       child: ListView.builder(
-        shrinkWrap: true,
         itemCount: _items.length,
         itemBuilder: (context, index) {
           return Text(_items[index]);
